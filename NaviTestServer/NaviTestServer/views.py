@@ -18,6 +18,7 @@ class Nodes(viewsets.ModelViewSet):
         if (not serializer.is_valid()):
             return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
+        return Response(data=serializer.data['id'],status=status.HTTP_201_CREATED)
     
 
     def update(self, request, *args, **kwargs):
@@ -40,7 +41,7 @@ class Nodes(viewsets.ModelViewSet):
 
 class Navigate(viewsets.ViewSet):
     base_name = "navigate"
-    serializer_class = NavigateSerializer
+    serializer_class = PointSerializer
 
     def list(self,request):
         from_id = request.GET.get('from')
@@ -52,6 +53,6 @@ class Navigate(viewsets.ViewSet):
             to_node = Node.objects.get(pk = to_id)
         except:
             return Response(data='node not found', status=status.HTTP_400_BAD_REQUEST)
-        seializer =  self.serializer_class(AStar.find_path(from_node,to_node))
+        seializer =  self.serializer_class(AStar.find_path(from_node,to_node),many=True)
         return Response(seializer.data)
     

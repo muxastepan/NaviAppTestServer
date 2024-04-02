@@ -46,13 +46,9 @@ class Point:
     y: float
     z: float
 
-@dataclass 
-class PointCollection:
-    points:list[Point]
-
 class AStar:
     @staticmethod 
-    def find_path(start:Node, goal:Node)->PointCollection:
+    def find_path(start:Node, goal:Node)->list[Point]:
         all_nodes = []
         start_node = AStarNode(start, all_nodes)
         goal_node = AStarNode(goal,all_nodes)
@@ -89,7 +85,7 @@ class AStar:
 
     
     @staticmethod
-    def __get_path_for_node(path_node:AStarNode,start_node:AStarNode)->PointCollection:
+    def __get_path_for_node(path_node:AStarNode,start_node:AStarNode)->list[Point]:
         result_nodes = []
         current_node = path_node
 
@@ -105,7 +101,7 @@ class AStar:
         points = []
         for node in result_nodes:
             points.append(Point(node.node.x,node.node.y,node.node.z))
-        return PointCollection(points)
+        return points
         
 
     @staticmethod

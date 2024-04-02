@@ -35,6 +35,3 @@ class PointSerializer(serializers.Serializer):
     x = serializers.FloatField()
     y = serializers.FloatField()
     z = serializers.FloatField()
-
-class NavigateSerializer(serializers.Serializer):
-    points = PointSerializer(many=True)
