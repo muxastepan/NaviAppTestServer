@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
-from NaviTestServer.models import Node
+from NaviTestServer.models import Node,Point
 
 import math
 
@@ -9,7 +9,6 @@ import math
 class AStarNode:
     node:Node
     from_node:Optional[AStarNode]
-    path_length_from_start: Optional[float]
     heuristics_estimate_path_length: Optional[float]
     neighbors: Optional[list[AStarNode]]
 
@@ -19,13 +18,6 @@ class AStarNode:
         self.heuristics_estimate_path_length = None
         self.neighbors = self.get_neighbors(all_nodes)
         self.from_node = None
-        
-
-    def estimate_full_path_length(self)->float:
-        if not self.path_length_from_start:
-            self.path_length_from_start = 0
-        return self.heuristics_estimate_path_length + self.path_length_from_start
-
 
     def get_neighbors(self,all_nodes:list[AStarNode])->list[AStarNode]:
         self.neighbors = []
@@ -40,11 +32,6 @@ class AStarNode:
         return self.neighbors
 
 
-@dataclass
-class Point:
-    x: float
-    y: float
-    z: float
 
 class AStar:
     @staticmethod 
@@ -58,7 +45,7 @@ class AStar:
         open_set.append(start_node)
 
         while len(open_set)>0:
-            current_node = next(iter(sorted(open_set, key=lambda a: a.estimate_full_path_length())),None)
+            current_node = next(iter(sorted(open_set, key=lambda a: -a.heuristics_estimate_path_length)),None)
             if current_node.node == goal:
                 return AStar.__get_path_for_node(current_node,start_node)
             open_set.remove(current_node)
@@ -70,16 +57,13 @@ class AStar:
                 open_node = next(filter(lambda node:node==neighbour_node,open_set),None)
 
                 if not open_node:
-                    neighbour_node.heuristics_estimate_path_length = current_node.path_length_from_start 
-                    + AStar.__get_heuristics_path_length(current_node, neighbour_node)
+                    neighbour_node.heuristics_estimate_path_length = AStar.__get_heuristics_path_length(current_node, neighbour_node)
                     neighbour_node.from_node = current_node
-                    neighbour_node.path_length_from_start = AStar.__get_heuristics_path_length(neighbour_node,start_node)
                     open_set.append(neighbour_node)
                 
-                elif (current_node.path_length_from_start + AStar.__get_heuristics_path_length(current_node, open_node) 
-                      < open_node.path_length_from_start):
+                elif (AStar.__get_heuristics_path_length(current_node, open_node) 
+                      < open_node.heuristics_estimate_path_length):
                     open_node.from_node = current_node
-                    open_node.path_length_from_start = current_node.path_length_from_start + AStar.__get_heuristics_path_length(current_node,open_node)
 
         return None
 
@@ -100,10 +84,10 @@ class AStar:
 
         points = []
         for node in result_nodes:
-            points.append(Point(node.node.x,node.node.y,node.node.z))
+            points.append(node.node.point)
         return points
         
 
     @staticmethod
     def __get_heuristics_path_length(start:AStarNode,end:AStarNode)->float:
-        return math.sqrt((end.node.x - start.node.x)**2 + (end.node.y - start.node.y)**2)
+        return math.sqrt((end.node.point.x - start.node.point.x)**2 + (end.node.point.y - start.node.point.y)**2)

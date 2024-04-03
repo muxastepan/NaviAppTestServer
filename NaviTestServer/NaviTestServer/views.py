@@ -18,7 +18,7 @@ class Nodes(viewsets.ModelViewSet):
         if (not serializer.is_valid()):
             return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
-        return Response(data=serializer.data['id'],status=status.HTTP_201_CREATED)
+        return Response(data=serializer.data,status=status.HTTP_201_CREATED)
     
 
     def update(self, request, *args, **kwargs):
@@ -32,12 +32,79 @@ class Nodes(viewsets.ModelViewSet):
 
 
     def perform_destroy(self, instance):
+        instance.point.delete()
         instance.delete()
     
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class Floors(viewsets.ModelViewSet):
+    base_name = "floors"
+    serializer_class = FloorSerializer
+    queryset = Floor.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+        return Response(data=serializer.data,status=status.HTTP_201_CREATED)
+    
+    def perform_destroy(self, instance):
+        instance.delete()
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class Points(viewsets.ModelViewSet):
+    base_name = "points"
+    serializer_class = PointSerializer
+    queryset = Point.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save()
+        return Response(data=serializer.data,status=status.HTTP_201_CREATED)
+    
+    def perform_destroy(self, instance):
+        instance.delete()
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+class Areas(viewsets.ModelViewSet):
+    base_name = "areas"
+    serializer_class = AreaSerializer
+    queryset = Area.objects.all()
+
+    def perform_create(self, serializer):
+        if (not serializer.is_valid()):
+            return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response(data=serializer.data,status=status.HTTP_201_CREATED)
+    
+    def perform_destroy(self, instance):
+        instance.points.clear()
+        instance.delete()
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.serializer_class(instance,request.data,partial=True)
+        
+        if(serializer.is_valid()):
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
 
 class Navigate(viewsets.ViewSet):
     base_name = "navigate"
