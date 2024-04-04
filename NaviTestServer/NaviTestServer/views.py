@@ -87,7 +87,8 @@ class Areas(viewsets.ModelViewSet):
         return Response(data=serializer.data,status=status.HTTP_201_CREATED)
     
     def perform_destroy(self, instance):
-        instance.points.clear()
+        for point in instance.points.all():
+            point.delete()
         instance.delete()
     
     def destroy(self, request, *args, **kwargs):
