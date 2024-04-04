@@ -28,7 +28,7 @@ router.register("navigate",Navigate,basename="navigate")
 router.register("points",Points,basename="points")
 router.register("areas",Areas,basename="areas")
 
-nodes_urlpatterns = [path("api/", include(router.urls))]
+nodes_urlpatterns = [path("", include(router.urls))]
 
 urlpatterns = [
     path('admin/', admin.site.urls),
