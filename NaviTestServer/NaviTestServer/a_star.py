@@ -11,11 +11,12 @@ class AStarNode:
     from_node:Optional[AStarNode]
     heuristics_estimate_path_length: Optional[float]
     neighbors: Optional[list[AStarNode]]
+    path_length_from_start:Optional[float]
 
     def __init__(self,node:Node,all_nodes:list[AStarNode]):
         self.node = node
-        self.path_length_from_start = None
-        self.heuristics_estimate_path_length = None
+        self.path_length_from_start = 0
+        self.heuristics_estimate_path_length = 0
         self.neighbors = self.get_neighbors(all_nodes)
         self.from_node = None
 
@@ -31,6 +32,8 @@ class AStarNode:
 
         return self.neighbors
 
+    def estimate_full_path(self):
+        return self.path_length_from_start + self.heuristics_estimate_path_length
 
 
 class AStar:
@@ -45,7 +48,7 @@ class AStar:
         open_set.append(start_node)
 
         while len(open_set)>0:
-            current_node = next(iter(sorted(open_set, key=lambda a: -a.heuristics_estimate_path_length)),None)
+            current_node = next(iter(sorted(open_set, key=lambda a: a.estimate_full_path())),None)
             if current_node.node == goal:
                 return AStar.__get_path_for_node(current_node,start_node)
             open_set.remove(current_node)
@@ -59,11 +62,13 @@ class AStar:
                 if not open_node:
                     neighbour_node.heuristics_estimate_path_length = AStar.__get_heuristics_path_length(current_node, neighbour_node)
                     neighbour_node.from_node = current_node
+                    neighbour_node.path_length_from_start = current_node.path_length_from_start +  AStar.__get_heuristics_path_length(neighbour_node, current_node)
                     open_set.append(neighbour_node)
                 
-                elif (AStar.__get_heuristics_path_length(current_node, open_node) 
+                elif (current_node.estimate_full_path()
                       < open_node.heuristics_estimate_path_length):
                     open_node.from_node = current_node
+                    open_node.path_length_from_start = current_node.path_length_from_start
 
         return None
 
