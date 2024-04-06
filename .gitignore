@@ -1,0 +1,6 @@
+mysql
+venv
+app/media/maps/*
+.idea
+.vscode
+__pycache__
