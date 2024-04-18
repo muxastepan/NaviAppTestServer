@@ -7,7 +7,7 @@ class FloorSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
-            "map_image",
+            "mapImage",
         )
 
 

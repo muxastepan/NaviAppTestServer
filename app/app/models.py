@@ -15,7 +15,7 @@ class Point(models.Model):
 
 class Floor(models.Model):
     name = models.CharField(max_length = 255,verbose_name='Наименование')
-    map_image = models.ImageField(upload_to='maps/',verbose_name='Карта',blank=True)
+    mapImage = models.ImageField(upload_to='maps/',verbose_name='Карта',blank=True)
     
     def __str__(self) -> str:
         return self.name
