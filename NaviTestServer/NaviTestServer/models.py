@@ -23,3 +23,13 @@ class Floor(models.Model):
 class Area(models.Model):
     points = models.ManyToManyField("Point")
     floor = models.ForeignKey("Floor",on_delete = models.CASCADE,verbose_name="Этаж")
+
+class Shop(models.Model):
+    title = models.CharField(verbose_name='Наименование',max_length=255)
+    node = models.ForeignKey(Node,verbose_name='Точка',default=None,blank=True,null=True,on_delete=models.SET_DEFAULT)
+    area = models.ForeignKey(Area,verbose_name='Область',default=None,blank=True,null=True,on_delete=models.SET_DEFAULT)
+    
+
+class Terminal(models.Model):
+    title = models.CharField(verbose_name='Наименование',max_length=255)
+    node = models.ForeignKey(Node,verbose_name='Точка',default=None,blank=True,null=True,on_delete=models.SET_DEFAULT)

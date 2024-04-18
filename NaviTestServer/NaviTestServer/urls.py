@@ -27,7 +27,8 @@ router.register("floors",Floors,basename="floors")
 router.register("navigate",Navigate,basename="navigate")
 router.register("points",Points,basename="points")
 router.register("areas",Areas,basename="areas")
-
+router.register("shops",ShopView,basename=ShopView.base_name)
+router.register("terminals",TerminalView,basename=TerminalView.base_name)
 nodes_urlpatterns = [path("", include(router.urls))]
 
 urlpatterns = [

@@ -1,6 +1,38 @@
 from rest_framework import serializers
 from NaviTestServer.models import *
 
+class ShopSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Shop
+        fields = ['id','title','node','area']
+    
+    def create(self, validated_data):
+        if(validated_data['node'] and validated_data['area']):
+            shop,res = Shop.objects.get_or_create(title=validated_data['title'], 
+                                                          node=validated_data['node'],area=validated_data['area'])
+        elif(validated_data['node']):
+            shop,res = Shop.objects.get_or_create(title=validated_data['title'], 
+                                                          node=validated_data['node'])
+        elif(validated_data['area']):
+            shop,res = Shop.objects.get_or_create(title=validated_data['title'], 
+                                                          area=validated_data['area'])
+        else:
+            shop,res = Shop.objects.get_or_create(title=validated_data['title'])
+        return shop
+
+class TerminalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Terminal
+        fields = ['id','title','node']
+    
+    def create(self, validated_data):
+        if(validated_data['node']):
+            terminal,res = Terminal.objects.get_or_create(title=validated_data['title'], 
+                                                          node=validated_data['node'])
+        else:
+            terminal,res = Terminal.objects.get_or_create(title=validated_data['title'])
+        return terminal
+
 class FloorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Floor
@@ -90,7 +122,7 @@ class AreaSerializer(serializers.ModelSerializer):
             point.floor = validated_data['floor']
             point.save()
 
-        floor,res = Floor.objects.get_or_create(validated_data['floor'])
+        floor = Floor.objects.get(id=validated_data['floor'].id)
         instance.floor =floor
 
         instance.save()

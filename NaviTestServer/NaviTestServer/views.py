@@ -9,6 +9,43 @@ from NaviTestServer.models import *
 from NaviTestServer.serializers import *
 from NaviTestServer.a_star import *
 
+class BaseView(viewsets.ModelViewSet):
+    def perform_create(self, serializer):
+        if (not serializer.is_valid()):
+            return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response(data=serializer.data,status=status.HTTP_201_CREATED)
+    
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.serializer_class(instance,request.data,partial=True)
+        if(serializer.is_valid()):
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+    def perform_destroy(self, instance):
+        instance.delete()
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ShopView(BaseView):
+    base_name="shops"
+    serializer_class = ShopSerializer
+    queryset = Shop.objects.all()
+
+class TerminalView(BaseView):
+    base_name = "terminals"
+    serializer_class = TerminalSerializer
+    queryset = Terminal.objects.all()
+
 class Nodes(viewsets.ModelViewSet):
     base_name = "nodes"
     serializer_class = NodeSerializer
